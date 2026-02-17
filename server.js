@@ -67,24 +67,69 @@ app.post("/chat", async (req, res) => {
 
     const recentMessages = conversation.messages.slice(-10);
 
+    /* ================= REAL-TIME SEARCH ================= */
+
+    let searchResults = "";
+
+    if (process.env.SERPER_API_KEY) {
+      try {
+        const searchResponse = await axios.post(
+          "https://google.serper.dev/search",
+          { q: message },
+          {
+            headers: {
+              "X-API-KEY": process.env.SERPER_API_KEY,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        const results = searchResponse.data?.organic?.slice(0, 3);
+
+        if (results?.length) {
+          searchResults = results.map(r =>
+            `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
+          ).join("\n\n");
+        }
+
+      } catch (err) {
+        console.log("Search skipped:", err.message);
+      }
+    }
+
+    /* ================= AI CALL ================= */
+
     const aiResponse = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "meta-llama/llama-3.1-8b-instruct",
+        model: "openai/gpt-4o-mini",  // 🔥 better model
         messages: [
-          { role: "system", content: "You are AegisAI." },
+          {
+            role: "system",
+            content: `
+You are AegisAI.
+Use real-time search data if provided.
+Be accurate, clear, and structured.
+Never mention knowledge cutoff.
+`
+          },
+          ...(searchResults
+            ? [{ role: "system", content: `REAL-TIME DATA:\n${searchResults}` }]
+            : []),
           ...recentMessages
         ]
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://aegisai-topaz.vercel.app",
+          "X-Title": "AegisAI"
         }
       }
     );
 
-    const reply =
+const reply =
       aiResponse.data?.choices?.[0]?.message?.content ||
       "No response from AI.";
 
