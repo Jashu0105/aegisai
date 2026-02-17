@@ -1,3 +1,46 @@
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const axios = require("axios");
+const mongoose = require("mongoose");
+const rateLimit = require("express-rate-limit");
+
+const app = express();
+
+/* ================= MIDDLEWARE ================= */
+
+app.use(cors());
+app.use(express.json());
+
+app.use(rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100
+}));
+
+/* ================= MONGODB ================= */
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.error("MongoDB Error:", err));
+
+/* ================= SCHEMA ================= */
+
+const conversationSchema = new mongoose.Schema({
+  userId: { type: String, required: true, unique: true },
+  messages: [
+    {
+      role: String,
+      content: String,
+      timestamp: { type: Date, default: Date.now }
+    }
+  ]
+});
+
+const Conversation = mongoose.model("Conversation", conversationSchema);
+
+/* ================= CHAT ROUTE ================= */
+
 app.post("/chat", async (req, res) => {
   try {
     const { message, userId } = req.body;
@@ -22,64 +65,19 @@ app.post("/chat", async (req, res) => {
 
     const recentMessages = conversation.messages.slice(-10);
 
-    let searchResults = null;
-
-    try {
-      const searchResponse = await axios.post(
-        "https://google.serper.dev/search",
-        { q: message },
-        {
-          headers: {
-            "X-API-KEY": process.env.SERPER_API_KEY,
-            "Content-Type": "application/json"
-          }
-        }
-      );
-
-      const results = searchResponse.data.organic?.slice(0, 3);
-
-      if (results?.length) {
-        searchResults = results.map(r =>
-          `Title: ${r.title}
-Snippet: ${r.snippet}
-Source: ${r.link}`
-        ).join("\n\n");
-      }
-
-    } catch (_) {}
-
-    const aiMessages = [
-      {
-        role: "system",
-        content: `
-You are AegisAI.
-Use real-time data if provided.
-Be clear, structured, and professional.
-Never mention knowledge cutoff.
-`
-      },
-      ...recentMessages
-    ];
-
-    if (searchResults) {
-      aiMessages.push({
-        role: "system",
-        content: `REAL-TIME SEARCH DATA:\n${searchResults}`
-      });
-    }
-
     const aiResponse = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openai/gpt-3.5-turbo",   // ✅ safer & cheaper model
-        messages: aiMessages
+        model: "meta-llama/llama-3.1-8b-instruct",
+        messages: [
+          { role: "system", content: "You are AegisAI." },
+          ...recentMessages
+        ]
       },
       {
         headers: {
-          "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://aegisai-backend-ifvc.onrender.com",
-          "X-Title": "AegisAI"
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json"
         }
       }
     );
@@ -98,7 +96,23 @@ Never mention knowledge cutoff.
     res.json({ reply });
 
   } catch (error) {
-    console.error("AI ERROR:", error.response?.data || error.message);
-    res.status(500).json({ reply: "AI service error." });
+    console.error("FULL ERROR:", error.response?.data || error.message);
+    res.status(500).json({
+      error: error.response?.data || error.message
+    });
   }
+});
+
+/* ================= HEALTH ================= */
+
+app.get("/", (req, res) => {
+  res.send("AegisAI Backend Running");
+});
+
+/* ================= START ================= */
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
