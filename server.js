@@ -2,6 +2,7 @@ require("dotenv").config();
 
 console.log("OPENROUTER KEY:", process.env.OPENROUTER_API_KEY);
 
+
 const express = require("express");
 const cors = require("cors");
 const axios = require("axios");
@@ -33,6 +34,23 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
+/* ================= JWT VERIFY ================= */
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Access denied" });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ message: "Invalid token" });
+
+    req.user = user;
+    next();
+  });
+}
 
 /* ================= SCHEMA ================= */
 
@@ -51,7 +69,8 @@ const Conversation = mongoose.model("Conversation", conversationSchema);
 
 /* ================= CHAT ROUTE ================= */
 
-app.post("/chat", async (req, res) => {
+app.post("/chat", authenticateToken, async (req, res) => {
+
   try {
     const { message, userId } = req.body;
 

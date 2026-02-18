@@ -26,16 +26,20 @@ async function sendMessage() {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
 try {
-    const response = await fetch("https://aegisai-backend-ifvc.onrender.com/chat", {
-        method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: message,
-                userId: "frontend_user"
-            })
-        });
+    const token = localStorage.getItem("token");
+
+const response = await fetch("https://aegisai-backend-ifvc.onrender.com/chat", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+        message: message,
+        userId: userId
+    })
+});
+
 
         const data = await response.json();
 
