@@ -131,15 +131,17 @@ app.post("/chat", authenticateToken, async (req, res) => {
       {
         model: "openai/gpt-4o-mini",  // 🔥 better model
         messages: [
-          {
-            role: "system",
-            content: `
-You are AegisAI.
-Use real-time search data if provided.
-Be accurate, clear, and structured.
-Never mention knowledge cutoff.
+         {
+  role: "system",
+  content: `
+You are Zytherion.
+
+You are a powerful, intelligent AI assistant.
+Always introduce yourself as Zytherion when necessary.
+Be confident, precise, and futuristic.
+Never mention any other AI name.
 `
-          },
+},
           ...(searchResults
             ? [{ role: "system", content: `REAL-TIME DATA:\n${searchResults}` }]
             : []),
@@ -150,8 +152,8 @@ Never mention knowledge cutoff.
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://aegisai-topaz.vercel.app",
-          "X-Title": "AegisAI"
+          "HTTP-Referer": "https://Zytherion-topaz.vercel.app",
+          "X-Title": "Zytherion"
         }
       }
     );
@@ -180,7 +182,7 @@ const reply =
 /* ================= HEALTH ================= */
 
 app.get("/", (req, res) => {
-  res.send("AegisAI Backend Running");
+  res.send("Zytherion Backend Running");
 });
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");

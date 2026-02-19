@@ -1,6 +1,6 @@
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open("aegisai-cache").then(cache => {
+    caches.open("Zytherion-cache").then(cache => {
       return cache.addAll([
         "/",
         "/index.html",
