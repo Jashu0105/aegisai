@@ -152,7 +152,7 @@ Never mention any other AI name.
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://Zytherion-topaz.vercel.app",
+          "HTTP-Referer": "https://aegisai-topaz.vercel.app",
           "X-Title": "Zytherion"
         }
       }

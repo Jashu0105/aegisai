@@ -2,7 +2,7 @@ const chatContainer = document.getElementById("chat-container");
 const userInput = document.getElementById("user-input");
 const sendBtn = document.getElementById("send-btn");
 
-const BACKEND_URL = "https://Zytherion-backend-ifvc.onrender.com/chat";
+const BACKEND_URL = "https://aegisai-backend-ifvc.onrender.com/chat";
 
 // Send message function
 async function sendMessage() {
@@ -28,7 +28,7 @@ async function sendMessage() {
 try {
     const token = localStorage.getItem("token");
 
-const response = await fetch("https://Zytherion-backend-ifvc.onrender.com/chat", {
+const response = await fetch("https://aegisai-backend-ifvc.onrender.com/chat", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
