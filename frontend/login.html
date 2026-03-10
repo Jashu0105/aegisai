@@ -1,38 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Zytherion Login</title>
+  <title>Zytherion Register</title>
 </head>
 <body>
-  <h2>Login</h2>
 
-  <input type="email" id="email" placeholder="Email" />
-  <br><br>
-  <input type="password" id="password" placeholder="Password" />
-  <br><br>
-  <button onclick="login()">Login</button>
+<h2>Register</h2>
 
-  <script>
-    async function login() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+<input type="email" id="email" placeholder="Email" />
+<br><br>
 
-      const res = await fetch("https://aegisai-backend-ifvc.onrender.com/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      });
+<input type="password" id="password" placeholder="Password" />
+<br><br>
 
-      const data = await res.json();
+<button onclick="register()">Register</button>
 
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        alert("Login successful");
-        window.location.href = "index.html";
-      } else {
-        alert(data.message || "Login failed");
-      }
+<p>Already have an account? <a href="login.html">Login</a></p>
+
+<script>
+async function register() {
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+
+  if (!email || !password) {
+    alert("Please enter email and password");
+    return;
+  }
+
+  try {
+    const res = await fetch("https://aegisai-backend-ifvc.onrender.com/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("Registration successful!");
+      window.location.href = "login.html";
+    } else {
+      alert(data.message || "Registration failed");
     }
-  </script>
+
+  } catch (error) {
+    alert("Server error. Please try again later.");
+  }
+
+}
+</script>
+
 </body>
 </html>

@@ -28,18 +28,23 @@ async function sendMessage() {
 try {
     const token = localStorage.getItem("token");
 
-const response = await fetch("https://aegisai-backend-ifvc.onrender.com/chat", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
-    },
-    body: JSON.stringify({
-        message: message,
-        userId: userId
-    })
+const response = await fetch("https://aegisai-backend-ifvc.onrender.com/api/auth/login", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: email,
+    password: password
+  })
 });
 
+const data = await response.json();
+
+if (data.token) {
+  localStorage.setItem("token", data.token);
+  alert("Login successful");
+}
 
         const data = await response.json();
 
