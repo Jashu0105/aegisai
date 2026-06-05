@@ -1,4 +1,4 @@
-ˇ
+
 /* ================= USER SCHEMA ================= */
 
 const userSchema = new mongoose.Schema({
