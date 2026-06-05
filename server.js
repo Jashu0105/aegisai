@@ -1,31 +1,4 @@
-require("dotenv").config();
-
-console.log("OPENROUTER KEY:", process.env.OPENROUTER_API_KEY);
-
-
-const express = require("express");
-const cors = require("cors");
-const axios = require("axios");
-const mongoose = require("mongoose");
-const rateLimit = require("express-rate-limit");
-
-const app = express();
-
-/* ================= MIDDLEWARE ================= */
-
-app.use(cors());
-app.use(express.json());
-
-app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
-}));
-
-/* ================= MONGODB ================= */
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.error("MongoDB Error:", err));
+ˇ
 /* ================= USER SCHEMA ================= */
 
 const userSchema = new mongoose.Schema({
@@ -188,18 +161,24 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 /* ================= REGISTER ================= */
-
 app.post("/api/auth/register", async (req, res) => {
   try {
+    console.log("REGISTER REQUEST:", req.body);
+
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: "Email and password required" });
+      return res.status(400).json({
+        message: "Email and password required"
+      });
     }
 
     const existingUser = await User.findOne({ email });
+
     if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(400).json({
+        message: "User already exists"
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -211,10 +190,20 @@ app.post("/api/auth/register", async (req, res) => {
 
     await newUser.save();
 
-    res.json({ message: "User registered successfully" });
+    console.log("USER CREATED:", email);
+
+    res.status(201).json({
+      message: "User registered successfully"
+    });
 
   } catch (error) {
-    res.status(500).json({ message: "Registration error" });
+    console.error("REGISTER ERROR:", error);
+
+    res.status(500).json({
+      message: "Registration error",
+      error: error.message,
+      stack: error.stack
+    });
   }
 });
 
