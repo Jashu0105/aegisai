@@ -1,13 +1,47 @@
+/* ================= IMPORTS & SETUP ================= */
+require("dotenv").config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const axios = require("axios");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-/* ================= USER SCHEMA ================= */
+const app = express();
+
+/* ================= MIDDLEWARE ================= */
+// Allows frontend to communicate with backend
+app.use(cors()); 
+// Parses incoming JSON requests
+app.use(express.json()); 
+
+/* ================= DATABASE CONNECTION ================= */
+// Ensure you have MONGO_URI set in your Render environment variables
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected Successfully"))
+  .catch((err) => console.error("MongoDB Connection Error:", err));
+
+/* ================= SCHEMAS & MODELS ================= */
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true }
 });
-
 const User = mongoose.model("User", userSchema);
-/* ================= JWT VERIFY ================= */
+
+const conversationSchema = new mongoose.Schema({
+  userId: { type: String, required: true, unique: true },
+  messages: [
+    {
+      role: String,
+      content: String,
+      timestamp: { type: Date, default: Date.now }
+    }
+  ]
+});
+const Conversation = mongoose.model("Conversation", conversationSchema);
+
+/* ================= JWT VERIFY MIDDLEWARE ================= */
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -25,160 +59,21 @@ function authenticateToken(req, res, next) {
   });
 }
 
-/* ================= SCHEMA ================= */
+/* ================= AUTH ROUTES ================= */
 
-const conversationSchema = new mongoose.Schema({
-  userId: { type: String, required: true, unique: true },
-  messages: [
-    {
-      role: String,
-      content: String,
-      timestamp: { type: Date, default: Date.now }
-    }
-  ]
-});
-
-const Conversation = mongoose.model("Conversation", conversationSchema);
-
-/* ================= CHAT ROUTE ================= */
-
-app.post("/chat", authenticateToken, async (req, res) => {
-
-  try {
-    const { message, userId } = req.body;
-
-    if (!message || !userId) {
-      return res.status(400).json({ reply: "Message and userId required." });
-    }
-
-    let conversation = await Conversation.findOne({ userId });
-
-    if (!conversation) {
-      conversation = new Conversation({
-        userId,
-        messages: []
-      });
-    }
-
-    conversation.messages.push({
-      role: "user",
-      content: message
-    });
-
-    const recentMessages = conversation.messages.slice(-10);
-
-    /* ================= REAL-TIME SEARCH ================= */
-
-    let searchResults = "";
-
-    if (process.env.SERPER_API_KEY) {
-      try {
-        const searchResponse = await axios.post(
-          "https://google.serper.dev/search",
-          { q: message },
-          {
-            headers: {
-              "X-API-KEY": process.env.SERPER_API_KEY,
-              "Content-Type": "application/json"
-            }
-          }
-        );
-
-        const results = searchResponse.data?.organic?.slice(0, 3);
-
-        if (results?.length) {
-          searchResults = results.map(r =>
-            `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
-          ).join("\n\n");
-        }
-
-      } catch (err) {
-        console.log("Search skipped:", err.message);
-      }
-    }
-
-    /* ================= AI CALL ================= */
-
-    const aiResponse = await axios.post(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        model: "openai/gpt-4o-mini",  // 🔥 better model
-        messages: [
-         {
-  role: "system",
-  content: `
-You are Zytherion.
-
-You are a powerful, intelligent AI assistant.
-Always introduce yourself as Zytherion when necessary.
-Be confident, precise, and futuristic.
-Never mention any other AI name.
-`
-},
-          ...(searchResults
-            ? [{ role: "system", content: `REAL-TIME DATA:\n${searchResults}` }]
-            : []),
-          ...recentMessages
-        ]
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://aegisai-topaz.vercel.app",
-          "X-Title": "Zytherion"
-        }
-      }
-    );
-
-const reply =
-      aiResponse.data?.choices?.[0]?.message?.content ||
-      "No response from AI.";
-
-    conversation.messages.push({
-      role: "assistant",
-      content: reply
-    });
-
-    await conversation.save();
-
-    res.json({ reply });
-
-  } catch (error) {
-    console.error("FULL ERROR:", error.response?.data || error.message);
-    res.status(500).json({
-      error: error.response?.data || error.message
-    });
-  }
-});
-
-/* ================= HEALTH ================= */
-
-app.get("/", (req, res) => {
-  res.send("Zytherion Backend Running");
-});
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
-/* ================= REGISTER ================= */
+// REGISTER
 app.post("/api/auth/register", async (req, res) => {
   try {
     console.log("REGISTER REQUEST:", req.body);
-
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({
-        message: "Email and password required"
-      });
+      return res.status(400).json({ message: "Email and password required" });
     }
 
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
-      return res.status(400).json({
-        message: "User already exists"
-      });
+      return res.status(400).json({ message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -189,16 +84,12 @@ app.post("/api/auth/register", async (req, res) => {
     });
 
     await newUser.save();
-
     console.log("USER CREATED:", email);
 
-    res.status(201).json({
-      message: "User registered successfully"
-    });
+    res.status(201).json({ message: "User registered successfully" });
 
   } catch (error) {
     console.error("REGISTER ERROR:", error);
-
     res.status(500).json({
       message: "Registration error",
       error: error.message,
@@ -207,8 +98,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-/* ================= LOGIN ================= */
-
+// LOGIN
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -236,10 +126,123 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-/* ================= START ================= */
+/* ================= CHAT ROUTE ================= */
+
+app.post("/chat", authenticateToken, async (req, res) => {
+  try {
+    const { message, userId } = req.body;
+
+    if (!message || !userId) {
+      return res.status(400).json({ reply: "Message and userId required." });
+    }
+
+    let conversation = await Conversation.findOne({ userId });
+
+    if (!conversation) {
+      conversation = new Conversation({
+        userId,
+        messages: []
+      });
+    }
+
+    conversation.messages.push({
+      role: "user",
+      content: message
+    });
+
+    const recentMessages = conversation.messages.slice(-10);
+
+    /* --- REAL-TIME SEARCH --- */
+    let searchResults = "";
+
+    if (process.env.SERPER_API_KEY) {
+      try {
+        const searchResponse = await axios.post(
+          "https://google.serper.dev/search",
+          { q: message },
+          {
+            headers: {
+              "X-API-KEY": process.env.SERPER_API_KEY,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        const results = searchResponse.data?.organic?.slice(0, 3);
+
+        if (results?.length) {
+          searchResults = results.map(r =>
+            `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
+          ).join("\n\n");
+        }
+      } catch (err) {
+        console.log("Search skipped:", err.message);
+      }
+    }
+
+    /* --- AI CALL --- */
+    const aiResponse = await axios.post(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        model: "openai/gpt-4o-mini",  
+        messages: [
+         {
+            role: "system",
+            content: `
+You are Zytherion.
+
+You are a powerful, intelligent AI assistant.
+Always introduce yourself as Zytherion when necessary.
+Be confident, precise, and futuristic.
+Never mention any other AI name.
+`
+          },
+          ...(searchResults
+            ? [{ role: "system", content: `REAL-TIME DATA:\n${searchResults}` }]
+            : []),
+          ...recentMessages
+        ]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://aegisai-topaz.vercel.app",
+          "X-Title": "Zytherion"
+        }
+      }
+    );
+
+    const reply =
+      aiResponse.data?.choices?.[0]?.message?.content ||
+      "No response from AI.";
+
+    conversation.messages.push({
+      role: "assistant",
+      content: reply
+    });
+
+    await conversation.save();
+
+    res.json({ reply });
+
+  } catch (error) {
+    console.error("FULL ERROR:", error.response?.data || error.message);
+    res.status(500).json({
+      error: error.response?.data || error.message
+    });
+  }
+});
+
+/* ================= HEALTH ================= */
+
+app.get("/", (req, res) => {
+  res.send("Zytherion Backend Running");
+});
+
+/* ================= START SERVER ================= */
 
 const PORT = process.env.PORT || 3000;
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
