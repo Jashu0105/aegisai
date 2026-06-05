@@ -25,26 +25,25 @@ async function sendMessage() {
 
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
-try {
-    const token = localStorage.getItem("token");
+    try {
+        const token = localStorage.getItem("token");
 
-const response = await fetch("https://aegisai-backend-ifvc.onrender.com/api/auth/login", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    email: email,
-    password: password
-  })
-});
+        // Fixed the incorrect fetch call to correctly target the chat endpoint
+        const response = await fetch(BACKEND_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ message: message }) 
+        });
 
-const data = await response.json();
-
-if (data.token) {
-  localStorage.setItem("token", data.token);
-  alert("Login successful");
-}
+        if (response.status === 401 || response.status === 403) {
+            // Token is invalid or expired
+            localStorage.removeItem("token");
+            window.location.href = "login.html";
+            return;
+        }
 
         const data = await response.json();
 
@@ -52,7 +51,7 @@ if (data.token) {
 
         const botDiv = document.createElement("div");
         botDiv.classList.add("message", "bot");
-        botDiv.innerText = data.reply || JSON.stringify(data);
+        botDiv.innerText = data.reply || "Error: Unexpected response format.";
         chatContainer.appendChild(botDiv);
 
         chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -62,8 +61,9 @@ if (data.token) {
 
         const errorDiv = document.createElement("div");
         errorDiv.classList.add("message", "bot");
-        errorDiv.innerText = "Connection error.";
+        errorDiv.innerText = "Connection error. Please try again.";
         chatContainer.appendChild(errorDiv);
+        console.error("Chat Error:", error);
     }
 }
 
@@ -76,6 +76,7 @@ userInput.addEventListener("keypress", function (e) {
         sendMessage();
     }
 });
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker

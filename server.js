@@ -130,10 +130,11 @@ app.post("/api/auth/login", async (req, res) => {
 
 app.post("/chat", authenticateToken, async (req, res) => {
   try {
-    const { message, userId } = req.body;
+    const { message } = req.body;
+    const userId = req.user.id; // Securely getting the ID from the token
 
-    if (!message || !userId) {
-      return res.status(400).json({ reply: "Message and userId required." });
+    if (!message) {
+      return res.status(400).json({ reply: "Message required." });
     }
 
     let conversation = await Conversation.findOne({ userId });

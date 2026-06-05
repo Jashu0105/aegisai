@@ -45,8 +45,8 @@ async function login() {
     if (res.ok) {
       alert("Login successful!");
       
-      // Save the authentication token to localStorage
-      localStorage.setItem("zytherion_token", data.token);
+      // Fixed mismatched token key
+      localStorage.setItem("token", data.token);
       
       // Redirect to your main chat interface
       window.location.href = "index.html"; 
