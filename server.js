@@ -153,10 +153,14 @@ app.post("/chat", authenticateToken, async (req, res) => {
 
     const recentMessages = conversation.messages.slice(-10);
 
-    /* --- REAL-TIME SEARCH --- */
+  /* --- REAL-TIME SEARCH --- */
     let searchResults = "";
 
+    console.log("--- START SERPER DEBUG ---");
+    console.log("Checking for environment variable...");
+    
     if (process.env.SERPER_API_KEY) {
+      console.log("SERPER_API_KEY detected! Triggering Google search for:", message);
       try {
         const searchResponse = await axios.post(
           "https://google.serper.dev/search",
@@ -170,17 +174,23 @@ app.post("/chat", authenticateToken, async (req, res) => {
         );
 
         const results = searchResponse.data?.organic?.slice(0, 3);
+        console.log(`Serper API connection successful. Found ${results?.length || 0} organic links.`);
 
         if (results?.length) {
           searchResults = results.map(r =>
             `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
           ).join("\n\n");
+          console.log("Search data successfully formatted for Zytherion context.");
+        } else {
+          console.log("Serper responded fine, but no search results match that query.");
         }
       } catch (err) {
-        console.log("Search skipped:", err.message);
+        console.error("Serper API Error:", err.response?.data || err.message);
       }
+    } else {
+      console.log("CRITICAL: SERPER_API_KEY is completely missing or unreadable by node.");
     }
-
+    console.log("--- END SERPER DEBUG ---");
     /* --- AI CALL --- */
     const aiResponse = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
@@ -247,3 +257,32 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+async function newFunction(message) {
+  let searchResults = "";
+
+  if (process.env.SERPER_API_KEY) {
+    try {
+      const searchResponse = await axios.post(
+        "https://google.serper.dev/search",
+        { q: message },
+        {
+          headers: {
+            "X-API-KEY": process.env.SERPER_API_KEY,
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      const results = searchResponse.data?.organic?.slice(0, 3);
+
+      if (results?.length) {
+        searchResults = results.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
+        ).join("\n\n");
+      }
+    } catch (err) {
+      console.log("Search skipped:", err.message);
+    }
+  }
+  return searchResults;
+}
