@@ -19,20 +19,30 @@
 
 <div class="app">
 
-    <!-- High-Performance Global Header -->
     <div class="header">
         <h1>Zytherion</h1>
-        <span>Quantum Mainframe Active</span>
+        <div class="header-controls">
+            <button id="feedback-toggle-btn" onclick="toggleFeedbackPanel()">Provide Feedback</button>
+            <span>Quantum Mainframe Active</span>
+        </div>
     </div>
 
-    <!-- Active Message Stream Stream -->
+    <div id="feedback-panel" class="feedback-panel-hidden">
+        <h3>Submit System Diagnostics & Feedback</h3>
+        <p>Help us improve Zytherion's core model context and workspace features.</p>
+        <textarea id="user-feedback" placeholder="Describe features you would like to see, or bugs encountered..."></textarea>
+        <div class="panel-actions">
+            <button class="action-cancel" onclick="toggleFeedbackPanel()">Dismiss</button>
+            <button class="action-submit" onclick="submitFeedback()">Transmit Feedback</button>
+        </div>
+    </div>
+
     <div id="chat-container">
         <div class="message bot">
             Hello 👋 I am Zytherion. Core operations online. Search matrices fully initialized. How can I assist you today?
         </div>
     </div>
 
-    <!-- Floating Dock Controls -->
     <div class="input-area">
         <input 
             type="text" 
@@ -43,9 +53,46 @@
         <button id="send-btn">Send</button>
     </div>
 
+    <div class="app-footer">
+        <span>Need core assistance? <a href="mailto:support@zytherion.ai?subject=Zytherion Support Inquiry">Contact Support Team</a></span>
+    </div>
+
 </div>
 
 <script src="script.js"></script>
+
+<script>
+// Toggle mechanism for the premium feedback drawer
+function toggleFeedbackPanel() {
+    const panel = document.getElementById("feedback-panel");
+    if (panel.classList.contains("feedback-panel-hidden")) {
+        panel.classList.remove("feedback-panel-hidden");
+        panel.classList.add("feedback-panel-visible");
+    } else {
+        panel.classList.remove("feedback-panel-visible");
+        panel.classList.add("feedback-panel-hidden");
+    }
+}
+
+// Submits the form via standard client mailto wrapper safely
+function submitFeedback() {
+    const feedbackText = document.getElementById("user-feedback").value.trim();
+    if (!feedbackText) {
+        alert("Please enter your feedback before transmitting.");
+        return;
+    }
+    
+    const targetEmail = "support@zytherion.ai"; // Change this to your preferred email address
+    const subject = encodeURIComponent("Zytherion AI Core System Feedback");
+    const body = encodeURIComponent(feedbackText);
+    
+    window.location.href = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
+    
+    // Reset and close panel
+    document.getElementById("user-feedback").value = "";
+    toggleFeedbackPanel();
+}
+</script>
 
 </body>
 </html>
