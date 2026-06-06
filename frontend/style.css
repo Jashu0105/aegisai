@@ -1,177 +1,277 @@
-/* =========================
-   Global Reset
-========================= */
+/* ==========================================================================
+   GLOBAL DESIGN VARIABLES & RESET
+   ========================================================================== */
+:root {
+    --bg-main: #060a13;
+    --bg-surface: rgba(15, 23, 42, 0.6);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --accent-gradient: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    --accent-glow: rgba(59, 130, 246, 0.3);
+    --user-msg-bg: linear-gradient(135deg, #2563eb, #1d4ed8);
+    --bot-msg-bg: rgba(30, 41, 59, 0.7);
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Inter", "Segoe UI", sans-serif;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 body {
-    background: #f4f6f9;
+    background: var(--bg-main);
+    color: var(--text-primary);
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
+    overflow: hidden;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
 }
 
-/* =========================
-   Main App Container
-========================= */
+/* ==========================================================================
+   AUTH PAGES STYLE (Login & Register Cards)
+   ========================================================================== */
+.auth-wrapper {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+}
+
+.auth-card {
+    background: var(--bg-surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    padding: 40px 30px;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.auth-card h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.auth-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent-gradient);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+}
+
+.auth-footer {
+    margin-top: 25px;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.auth-footer a {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   MAIN CHAT INTERFACE (Zytherion APP)
+   ========================================================================== */
 .app {
-    width: 900px;
-    height: 90vh;
-    background: #ffffff;
-    border-radius: 16px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+    width: 1000px;
+    height: 85vh;
+    background: var(--bg-surface);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-/* =========================
-   Header
-========================= */
 .header {
     padding: 20px 30px;
-    border-bottom: 1px solid #e6e9ee;
+    border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #ffffff;
+    background: rgba(10, 15, 30, 0.4);
 }
 
 .header h1 {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 600;
-    color: #1e293b;
+    background: var(--accent-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .header span {
-    font-size: 14px;
-    color: #64748b;
+    font-size: 13px;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    font-weight: 500;
 }
 
-/* =========================
-   Chat Container
-========================= */
 #chat-container {
     flex: 1;
     padding: 30px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    background: #f8fafc;
+    gap: 16px;
+    background: rgba(6, 10, 19, 0.2);
 }
 
-/* Scrollbar */
+/* Custom modern scrollbar */
 #chat-container::-webkit-scrollbar {
     width: 6px;
 }
-
 #chat-container::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
 }
 
-/* =========================
-   Messages
-========================= */
+/* Message bubbles styling */
 .message {
-    max-width: 70%;
-    padding: 14px 18px;
-    border-radius: 14px;
+    max-width: 75%;
+    padding: 14px 20px;
+    border-radius: 16px;
     font-size: 15px;
-    line-height: 1.5;
-    animation: fadeIn 0.3s ease-in-out;
-    white-space: pre-wrap;
+    line-height: 1.6;
+    animation: fadeIn 0.3s ease-out forwards;
 }
 
-/* User Message */
 .user {
     align-self: flex-end;
-    background: #2563eb;
+    background: var(--user-msg-bg);
     color: #ffffff;
-    border-bottom-right-radius: 6px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
 }
 
-/* Bot Message */
 .bot {
     align-self: flex-start;
-    background: #e2e8f0;
-    color: #1e293b;
-    border-bottom-left-radius: 6px;
+    background: var(--bot-msg-bg);
+    color: #e2e8f0;
+    border-bottom-left-radius: 4px;
+    border: 1px solid var(--border-color);
 }
 
-/* =========================
-   Input Area
-========================= */
+/* Chat Input Area */
 .input-area {
-    padding: 20px;
-    border-top: 1px solid #e6e9ee;
+    padding: 20px 30px;
+    border-top: 1px solid var(--border-color);
     display: flex;
-    gap: 12px;
-    background: #ffffff;
+    gap: 16px;
+    background: rgba(10, 15, 30, 0.4);
 }
 
 #user-input {
     flex: 1;
-    padding: 14px 16px;
-    border-radius: 10px;
-    border: 1px solid #d1d5db;
+    padding: 16px 20px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--text-primary);
     font-size: 15px;
     outline: none;
-    transition: 0.2s ease;
+    transition: all 0.3s ease;
 }
 
 #user-input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    border-color: #3b82f6;
+    box-shadow: 0 0 15px var(--accent-glow);
 }
 
-/* Send Button */
 #send-btn {
-    padding: 14px 22px;
-    border-radius: 10px;
+    padding: 0 26px;
+    border-radius: 14px;
     border: none;
-    background: #2563eb;
+    background: var(--accent-gradient);
     color: #ffffff;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 15px;
     cursor: pointer;
-    transition: 0.2s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 #send-btn:hover {
-    background: #1d4ed8;
     transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.4);
 }
 
-/* =========================
-   Animation
-========================= */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================
-   Responsive
-========================= */
-@media (max-width: 768px) {
-    .app {
-        width: 95%;
-        height: 95vh;
-    }
-
-    .message {
-        max-width: 85%;
-    }
+@media (max-width: 1024px) {
+    .app { width: 95%; height: 90vh; }
 }

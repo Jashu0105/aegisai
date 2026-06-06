@@ -3,18 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Zytherion</title>
-
+<title>Zytherion Workspace</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
-
-
 </head>
 <body>
+
 <script>
   const token = localStorage.getItem("token");
-
   if (!token) {
     window.location.href = "login.html";
   }
@@ -22,20 +19,20 @@
 
 <div class="app">
 
-    <!-- Header -->
+    <!-- Header Workspace Bar -->
     <div class="header">
         <h1>Zytherion</h1>
-        <span>Intelligent AI Assistant</span>
+        <span>System Core Active</span>
     </div>
 
-    <!-- Chat Container -->
+    <!-- Chat Container Context Stream -->
     <div id="chat-container">
         <div class="message bot">
-            Hello 👋 I am Zytherion. How can I assist you today?
+            Hello 👋 I am Zytherion. Quantum logic matrix initialized. How can I assist you today?
         </div>
     </div>
 
-    <!-- Input Area -->
+    <!-- Input Control Area -->
     <div class="input-area">
         <input 
             type="text" 
