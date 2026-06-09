@@ -71,6 +71,7 @@ CRITICAL CONTEXT & KNOWLEDGE OVERRIDE:
 - Even though your underlying base model weights were trained with a static data cutoff in late 2023, you have been fully upgraded with dynamic, real-time live search engines (Tavily & Serper Integration).
 - If a user asks you about your knowledge cutoff, limitations, or timeline, proudly explain that while your base training ended in 2023, you are equipped with live search matrices that allow you to browse the live web and pull current information in real-time as of ${now.getFullYear()}.`;
 }
+
 /* ================= AUTH ROUTES ================= */
 
 // REGISTER
@@ -145,18 +146,15 @@ app.post("/chat", authenticateToken, async (req, res) => {
     conversation.messages.push({ role: "user", content: message });
     const recentMessages = conversation.messages.slice(-10);
 
-   /* --- REAL-TIME SEARCH INTENT DETECTION (TAVILY W/ SERPER FAILOVER) --- */
+    /* --- REAL-TIME SEARCH INTENT DETECTION (TAVILY W/ SERPER FAILOVER) --- */
     let searchResults = "";
-    const realTimeKeywords = ['price', 'stock', 'today', 'now', 'weather', 'news', 'date', 'current'];
+    const realTimeKeywords = ['price', 'stock', 'today', 'now', 'weather', 'news', 'date', 'current', 'cutoff', 'knowledge', 'ceo', 'match', 'cup', 'launched'];
     const needsLiveContext = realTimeKeywords.some(kw => message.toLowerCase().includes(kw));
 
     console.log("--- START MULTI-ENGINE SEARCH DEBUG ---");
     
     if (needsLiveContext) {
-      
-      // ==========================================
-      // PLACE IT HERE: Create the filtered query string
-      // ==========================================
+      // Create the filtered query string to demand fresh 2025/2026 facts
       const secureQuery = `${message} latest news official 2025 2026`;
       console.log(`Optimizing search matrix query parameters: "${secureQuery}"`);
 
@@ -166,7 +164,7 @@ app.post("/chat", authenticateToken, async (req, res) => {
         try {
           const tavilyResponse = await axios.post("https://api.tavily.com/search", {
             api_key: process.env.TAVILY_API_KEY,
-            query: secureQuery, // <-- CHANGE THIS from 'message' to 'secureQuery'
+            query: secureQuery, 
             search_depth: "basic"
           });
           
@@ -187,7 +185,7 @@ app.post("/chat", authenticateToken, async (req, res) => {
         try {
           const serperResponse = await axios.post(
             "https://google.serper.dev/search",
-            { q: secureQuery }, // <-- CHANGE THIS from 'message' to 'secureQuery'
+            { q: secureQuery }, 
             {
               headers: {
                 "X-API-KEY": process.env.SERPER_API_KEY,
@@ -216,9 +214,10 @@ app.post("/chat", authenticateToken, async (req, res) => {
     }
     console.log("--- END MULTI-ENGINE SEARCH DEBUG ---");
 
-/* --- OPENROUTER AI ENGINE CALL --- */
+    /* --- OPENROUTER AI ENGINE CALL --- */
     const dynamicSystemPrompt = generateSystemPrompt();
 
+    // Structural enforcement using strict XML tag encapsulation
     let dynamicUserContent = message;
     if (searchResults) {
       dynamicUserContent = `<LIVE_WEB_DATA_SOURCE>
@@ -253,7 +252,7 @@ USER_QUESTION: ${message}`;
           "X-Title": "Zytherion"
         }
       }
-    ); // <-- This is where the closing formatting got messed up!
+    );
 
     const reply = aiResponse.data?.choices?.[0]?.message?.content || "No response from AI.";
 
@@ -267,6 +266,7 @@ USER_QUESTION: ${message}`;
     res.status(500).json({ error: error.response?.data || error.message });
   }
 });
+
 /* ================= HEALTH LAYER ================= */
 app.get("/", (req, res) => {
   res.send("Zytherion Backend Running Securely");
