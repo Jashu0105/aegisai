@@ -48,6 +48,7 @@ async function register() {
   }
 
   try {
+    // SYNCHRONIZED DIRECT TO ENGINE TERMINAL
     const res = await fetch("http://localhost:3000/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,10 +64,9 @@ async function register() {
       alert(data.message || "Registration encountered an issue.");
     }
   } catch(e) {
-    alert("Connection error. Could not reach registration terminal server.");
+    alert("Connection error. Could not reach registration terminal server on port 3000.");
   }
 }
 </script>
-
 </body>
 </html>

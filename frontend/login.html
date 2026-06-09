@@ -48,6 +48,7 @@ async function login() {
   }
 
   try {
+    // SYNCHRONIZED DIRECT TO ENGINE TERMINAL
     const res = await fetch("http://localhost:3000/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,10 +64,9 @@ async function login() {
       alert(data.message || "Login failed. Please check your credentials.");
     }
   } catch (error) {
-    alert("Unable to connect to the server. Please try again later.");
+    alert("Unable to connect to the server. Please verify your node process is running on port 3000.");
   }
 }
 </script>
-
 </body>
 </html>
