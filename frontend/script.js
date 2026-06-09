@@ -32,14 +32,13 @@ async function sendMessage() {
             return;
         }
 
-        const response = await fetch(BACKEND_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ message: message }) 
-        });
+       const response = await fetch("http://localhost:3000/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: userInput })
+});
+
+const data = await response.json();
 
         if (response.status === 401 || response.status === 403) {
             // Token is invalid or expired
