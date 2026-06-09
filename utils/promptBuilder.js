@@ -1,9 +1,5 @@
-// middleware/promptBuilder.js
-
 export function buildSystemPrompt() {
     const now = new Date();
-    
-    // Format the date dynamically for June 2026 and beyond
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Kolkata' };
     const formattedDate = now.toLocaleDateString('en-IN', options);
     const formattedTime = now.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' });

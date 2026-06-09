@@ -1,5 +1,5 @@
 /* ================= IMPORTS & SETUP ================= */
-require("dotenv").config();
+require("dotenv").config(); 
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -119,13 +119,14 @@ app.post("/chat", authenticateToken, async (req, res) => {
     conversation.messages.push({ role: "user", content: message });
     const recentMessages = conversation.messages.slice(-10);
 
-    /* --- REAL-TIME SEARCH INTENT DETECTION (TAVILY W/ SERPER FAILOVER) --- */
+    /* --- REAL-TIME SEARCH INTENT DETECTION --- */
     let searchResults = "";
-    const realTimeKeywords = ['price', 'stock', 'today', 'now', 'weather', 'news', 'date', 'current', 'cutoff', 'knowledge', 'ceo', 'match', 'cup', 'launched'];
+    const realTimeKeywords = ['price', 'stock', 'today', 'now', 'weather', 'news', 'date', 'current', 'cutoff', 'knowledge', 'ceo', 'match', 'cup', 'launched', 'avatar'];
     const needsLiveContext = realTimeKeywords.some(kw => message.toLowerCase().includes(kw));
 
     if (needsLiveContext) {
-      const secureQuery = `${message} latest news official 2025 2026`;
+      const secureQuery = `${message} current verified news updates 2025 2026`;
+      
       if (process.env.TAVILY_API_KEY) {
         try {
           const tavilyResponse = await axios.post("https://api.tavily.com/search", {
@@ -157,7 +158,7 @@ app.post("/chat", authenticateToken, async (req, res) => {
             searchResults = results.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`).join("\n\n");
           }
         } catch (serperErr) {
-          console.error("Secondary search engine failed as well.");
+          console.error("Secondary search engine failed.");
         }
       }
     }
@@ -206,7 +207,6 @@ USER_QUESTION: ${message}`;
     conversation.messages.push({ role: "assistant", content: reply });
     await conversation.save();
 
-    // FIXED PACKAGING: Sends back every possible format style to ensure the frontend script reads it smoothly!
     res.json({ 
       reply: reply,
       botReply: reply,
