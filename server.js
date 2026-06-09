@@ -134,133 +134,81 @@ app.post("/chat", authenticateToken, async (req, res) => {
     const { message } = req.body;
     const userId = req.user.id;
 
-    if (!message) {
-      return res.status(400).json({ reply: "Message required." });
-    }
+    if (!message) return res.status(400).json({ reply: "Message required." });
 
     let conversation = await Conversation.findOne({ userId });
-    if (!conversation) {
-      conversation = new Conversation({ userId, messages: [] });
-    }
+    if (!conversation) conversation = new Conversation({ userId, messages: [] });
 
     conversation.messages.push({ role: "user", content: message });
     const recentMessages = conversation.messages.slice(-10);
 
-    /* --- REAL-TIME SEARCH INTENT DETECTION (TAVILY W/ SERPER FAILOVER) --- */
+    // live search (if triggered)
     let searchResults = "";
     const realTimeKeywords = ['price', 'stock', 'today', 'now', 'weather', 'news', 'date', 'current', 'cutoff', 'knowledge', 'ceo', 'match', 'cup', 'launched'];
     const needsLiveContext = realTimeKeywords.some(kw => message.toLowerCase().includes(kw));
 
-    console.log("--- START MULTI-ENGINE SEARCH DEBUG ---");
-    
     if (needsLiveContext) {
-      // Create the filtered query string to demand fresh 2025/2026 facts
       const secureQuery = `${message} latest news official 2025 2026`;
-      console.log(`Optimizing search matrix query parameters: "${secureQuery}"`);
-
-      // Strategy A: Attempt high-priority Tavily optimization first
-      if (process.env.TAVILY_API_KEY) {
-        console.log("Live intent detected. Attempting primary engine [Tavily]...");
-        try {
+      try {
+        if (process.env.TAVILY_API_KEY) {
           const tavilyResponse = await axios.post("https://api.tavily.com/search", {
             api_key: process.env.TAVILY_API_KEY,
-            query: secureQuery, 
+            query: secureQuery,
             search_depth: "basic"
           });
-          
           if (tavilyResponse.data?.results?.length) {
-            searchResults = tavilyResponse.data.results
-              .map(r => `Title: ${r.title}\nContent: ${r.content}\nSource: ${r.url}`)
-              .join("\n\n");
-            console.log("Context successfully structured via primary Tavily layer.");
+            searchResults = tavilyResponse.data.results.map(r => `Title: ${r.title}\nContent: ${r.content}\nSource: ${r.url}`).join("\n\n");
           }
-        } catch (tavilyErr) {
-          console.warn("Primary Tavily layer failed or credit depleted. Falling back to Serper...", tavilyErr.message);
         }
+      } catch (e) {
+        console.warn('Tavily failed:', e.message);
       }
 
-      // Strategy B: Fallback/Alternative execution via Serper if Tavily missed or errored out
       if (!searchResults && process.env.SERPER_API_KEY) {
-        console.log("Attempting secondary engine [Serper/Google]...");
         try {
           const serperResponse = await axios.post(
             "https://google.serper.dev/search",
-            { q: secureQuery }, 
-            {
-              headers: {
-                "X-API-KEY": process.env.SERPER_API_KEY,
-                "Content-Type": "application/json"
-              }
-            }
+            { q: secureQuery },
+            { headers: { "X-API-KEY": process.env.SERPER_API_KEY, "Content-Type": "application/json" } }
           );
-
           const results = serperResponse.data?.organic?.slice(0, 3);
-          if (results?.length) {
-            searchResults = results.map(r =>
-              `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`
-            ).join("\n\n");
-            console.log("Context successfully recovered via backup Serper engine.");
-          }
-        } catch (serperErr) {
-          console.error("Secondary search engine failed as well:", serperErr.message);
+          if (results?.length) searchResults = results.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`).join("\n\n");
+        } catch (e) {
+          console.warn('Serper failed:', e.message);
         }
       }
-      
-      if (!searchResults) {
-        console.log("Search keys exist but both external engines returned null or failed.");
-      }
-    } else {
-      console.log("Static prompt structure parsed. API lookup skipped to optimize server resources.");
     }
-    console.log("--- END MULTI-ENGINE SEARCH DEBUG ---");
 
-    /* --- OPENROUTER AI ENGINE CALL --- */
     const dynamicSystemPrompt = generateSystemPrompt();
-
-    // Structural enforcement using strict XML tag encapsulation
     let dynamicUserContent = message;
     if (searchResults) {
-      dynamicUserContent = `<LIVE_WEB_DATA_SOURCE>
-The following documentation represents the exact, verified truth on the live internet as of today, June 2026. Analyze it meticulously before answering:
-${searchResults}
-</LIVE_WEB_DATA_SOURCE>
-
-<CRITICAL_DIRECTIVES>
-1. Cross-reference the USER_QUESTION against the text inside <LIVE_WEB_DATA_SOURCE>.
-2. If your internal pre-trained memory suggests an event hasn't happened yet but the live web documentation confirms it occurred between 2024 and 2026, you MUST treat your internal training memory as completely outdated and false.
-3. Prioritize exact proper nouns, official titles, and specific match results mentioned in the live text over your own assumptions or guesses.
-</CRITICAL_DIRECTIVES>
-
-USER_QUESTION: ${message}`;
+      dynamicUserContent = `<LIVE_WEB_DATA_SOURCE>\n${searchResults}\n</LIVE_WEB_DATA_SOURCE>\n\nUSER_QUESTION: ${message}`;
     }
 
     const aiResponse = await axios.post(
       "https://openrouter.ai/api/v1/chat/completions",
       {
-        model: "openai/gpt-4o-mini",  
+        model: "openai/gpt-4o-mini",
         messages: [
           { role: "system", content: dynamicSystemPrompt },
-          ...recentMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content })), 
-          { role: "user", content: dynamicUserContent } 
+          ...recentMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+          { role: "user", content: dynamicUserContent }
         ]
       },
       {
         headers: {
           Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://zytherionai-topaz.vercel.app", 
+          "HTTP-Referer": "https://zytherionai-topaz.vercel.app",
           "X-Title": "Zytherion"
         }
       }
     );
 
     const reply = aiResponse.data?.choices?.[0]?.message?.content || "No response from AI.";
-
     conversation.messages.push({ role: "assistant", content: reply });
     await conversation.save();
-
     res.json({ reply });
-
   } catch (error) {
     console.error("FULL ERROR:", error.response?.data || error.message);
     res.status(500).json({ error: error.response?.data || error.message });
