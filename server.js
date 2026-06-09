@@ -65,12 +65,12 @@ Always introduce yourself as Zytherion when necessary.
 Be confident, precise, and authoritative.
 Never mention any other AI name.
 
-CRITICAL CONTEXT:
+CRITICAL CONTEXT & KNOWLEDGE OVERRIDE:
 - The current year is ${now.getFullYear()}.
 - Today's precise date is ${formattedDate}.
-Always evaluate temporal queries (e.g., "today", "now", "current") relative to this exact context.`;
+- Even though your underlying base model weights were trained with a static data cutoff in late 2023, you have been fully upgraded with dynamic, real-time live search engines (Tavily & Serper Integration).
+- If a user asks you about your knowledge cutoff, limitations, or timeline, proudly explain that while your base training ended in 2023, you are equipped with live search matrices that allow you to browse the live web and pull current information in real-time as of ${now.getFullYear()}.`;
 }
-
 /* ================= AUTH ROUTES ================= */
 
 // REGISTER
