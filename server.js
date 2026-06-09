@@ -212,10 +212,20 @@ app.post("/chat", authenticateToken, async (req, res) => {
 /* --- OPENROUTER AI ENGINE CALL --- */
     const dynamicSystemPrompt = generateSystemPrompt();
 
-    // 1. Build a highly visible context block if live search data was successfully fetched
     let dynamicUserContent = message;
     if (searchResults) {
-      dynamicUserContent = `CONTEXT SEARCH DATA FROM LIVE WEB:\n${searchResults}\n\nUSER QUESTION: ${message}\n\nInstructions: Use the live context search data above to provide an accurate answer for June 2026. If the search context contradicts your internal knowledge base (like who a current CEO is, current stock prices, or movie statuses), prioritize the live web search context data as absolute truth.`;
+      dynamicUserContent = `<LIVE_WEB_DATA_SOURCE>
+The following documentation represents the exact, verified truth on the live internet as of today, June 2026. Analyze it meticulously before answering:
+${searchResults}
+</LIVE_WEB_DATA_SOURCE>
+
+<CRITICAL_DIRECTIVES>
+1. Cross-reference the USER_QUESTION against the text inside <LIVE_WEB_DATA_SOURCE>.
+2. If your internal pre-trained memory suggests an event hasn't happened yet but the live web documentation confirms it occurred between 2024 and 2026, you MUST treat your internal training memory as completely outdated and false.
+3. Prioritize exact proper nouns, official titles, and specific match results mentioned in the live text over your own assumptions or guesses.
+</CRITICAL_DIRECTIVES>
+
+USER_QUESTION: ${message}`;
     }
 
     const aiResponse = await axios.post(
@@ -224,8 +234,8 @@ app.post("/chat", authenticateToken, async (req, res) => {
         model: "openai/gpt-4o-mini",  
         messages: [
           { role: "system", content: dynamicSystemPrompt },
-          ...recentMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content })), // Past conversation thread
-          { role: "user", content: dynamicUserContent } // Current question packed with live search data
+          ...recentMessages.slice(0, -1).map(m => ({ role: m.role, content: m.content })), 
+          { role: "user", content: dynamicUserContent } 
         ]
       },
       {
@@ -236,19 +246,20 @@ app.post("/chat", authenticateToken, async (req, res) => {
           "X-Title": "Zytherion"
         }
       }
-    );
+    ); // <-- This is where the closing formatting got messed up!
 
-    const botReply = aiResponse.data?.choices?.[0]?.message?.content || "Sorry, I could not generate a response.";
-    conversation.messages.push({ role: "assistant", content: botReply });
+    const reply = aiResponse.data?.choices?.[0]?.message?.content || "No response from AI.";
+
+    conversation.messages.push({ role: "assistant", content: reply });
     await conversation.save();
 
-    res.json({ reply: botReply });
+    res.json({ reply });
+
   } catch (error) {
-    console.error("CHAT ERROR:", error);
-    res.status(500).json({ message: "Chat error", error: error.message });
+    console.error("FULL ERROR:", error.response?.data || error.message);
+    res.status(500).json({ error: error.response?.data || error.message });
   }
 });
-
 /* ================= HEALTH LAYER ================= */
 app.get("/", (req, res) => {
   res.send("Zytherion Backend Running Securely");
