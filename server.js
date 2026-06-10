@@ -131,7 +131,7 @@ app.post("/chat", authenticateToken, async (req, res) => {
     const needsLiveContext = realTimeKeywords.some(kw => message.toLowerCase().includes(kw));
 
     if (needsLiveContext) {
-      const secureQuery = `${message} current verified news updates 2025 2026`;
+      const secureQuery = `${message} latest verified news updates 2025 2026`;
       
       // Strategy A: Primary Search Layer (Tavily)
       if (process.env.TAVILY_API_KEY) {
@@ -145,13 +145,14 @@ app.post("/chat", authenticateToken, async (req, res) => {
             searchResults = tavilyResponse.data.results
               .map(r => `Title: ${r.title}\nContent: ${r.content}\nSource: ${r.url}`)
               .join("\n\n");
+            console.log("Context parsed successfully via Tavily Engine.");
           }
         } catch (tavilyErr) {
-          console.warn("Primary search engine limits reached. Redirecting to backup layer...");
+          console.warn("Tavily lookup bypassed or credit exhausted. Diverting to backup engine...");
         }
       }
 
-      // Strategy B: Backup Search Layer (Serper/Google)
+      // Strategy B: Backup Search Layer (Serper)
       if (!searchResults && process.env.SERPER_API_KEY) {
         try {
           const serperResponse = await axios.post(
@@ -164,9 +165,10 @@ app.post("/chat", authenticateToken, async (req, res) => {
           const results = serperResponse.data?.organic?.slice(0, 3);
           if (results?.length) {
             searchResults = results.map(r => `Title: ${r.title}\nSnippet: ${r.snippet}\nSource: ${r.link}`).join("\n\n");
+            console.log("Context parsed successfully via Serper Engine.");
           }
         } catch (serperErr) {
-          console.error("All engine endpoints saturated for live tracking context mapping.");
+          console.error("All fallback search engines unavailable.");
         }
       }
     }
