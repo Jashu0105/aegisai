@@ -361,13 +361,13 @@
             document.getElementById("confirmPassword").value = "";
 
             if (targetMode === "login") {
-                subtitle.innerText = "Access Core Operations Mainframe";
+                subtitle.innerText = "Login to Your Account";
                 usernameGroup.style.display = "none";
                 confirmPasswordGroup.style.display = "none";
                 document.getElementById("username").removeAttribute("required");
                 document.getElementById("confirmPassword").removeAttribute("required");
-                passwordLabel.innerText = "Secure Passkey Access";
-                submitBtn.innerText = "Login access";
+                passwordLabel.innerText = "Password";
+                submitBtn.innerText = "Login";
                 footerState.innerHTML = `New Users to Zytherion AI? <a class="auth-link" onclick="toggleFormMode('register')">Create New Account</a>`;
             } else {
                 subtitle.innerText = "Create New Account";
@@ -376,7 +376,7 @@
                 document.getElementById("username").setAttribute("required", "true");
                 document.getElementById("confirmPassword").setAttribute("required", "true");
                 passwordLabel.innerText = "Create Secure Passkey";
-                submitBtn.innerText = "Provision";
+                submitBtn.innerText = "Register";
                 footerState.innerHTML = `Already a registered user? <a class="auth-link" onclick="toggleFormMode('login')">Login</a>`;
             }
         }
