@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zytherion AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #070a13 0%, #02040a 100%);
@@ -273,7 +272,7 @@
         .support-channels {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 16px;
         }
 
         .support-icon-link {
@@ -287,11 +286,6 @@
         .support-icon-link:hover {
             color: var(--accent);
             transform: translateY(-1px);
-        }
-
-        .support-icon-link svg {
-            width: 16px;
-            height: 16px;
         }
 
         .disclaimer-tag {
@@ -340,13 +334,13 @@
             <div class="workspace-footer">
                 <div class="support-channels">
                     <a href="mailto:zytherionai@gmail.com" class="support-icon-link" title="Email Support">
-                        <i data-lucide="mail"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     </a>
                     <a href="https://www.instagram.com/zyntherionai" target="_blank" rel="noopener noreferrer" class="support-icon-link" title="Instagram Support">
-                        <i data-lucide="instagram"></i>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                     </a>
                 </div>
-                <div class="disclaimer-tag">Zytherion is an AI and may make mistakes.</div>
+                <div class="disclaimer-tag">Zytherion AI is an AI and may make mistakes.</div>
             </div>
         </div>
     </div>
@@ -369,9 +363,6 @@
             localStorage.removeItem("token");
             window.location.href = "login.html";
         });
-
-        // Initialize Lucide SVG Vector Embed Engine 
-        lucide.createIcons();
     </script>
     <script src="script.js"></script>
 </body>
