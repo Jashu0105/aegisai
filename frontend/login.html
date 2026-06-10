@@ -258,7 +258,7 @@
 <body>
 
     <div class="top-bar">
-        <button class="ui-btn" id="themeToggleBtn">🌓 Toggle Theme</button>
+        <button class="ui-btn" id="themeToggleBtn">🌓 Theme</button>
     </div>
 
     <div class="auth-card">
@@ -272,17 +272,17 @@
 
         <form id="authForm" onsubmit="handleFormSubmission(event)">
             <div class="form-group" id="usernameGroup">
-                <label class="form-label">Operator Handle Name</label>
-                <input class="input-field" type="text" id="username" placeholder="Operator Name" autocomplete="name">
+                <label class="form-label">User Name</label>
+                <input class="input-field" type="text" id="username" placeholder="User Name" autocomplete="name">
             </div>
 
             <div class="form-group">
-                <label class="form-label">Email Matrix String</label>
+                <label class="form-label">Email Address</label>
                 <input class="input-field" type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
             </div>
             
             <div class="form-group">
-                <label class="form-label" id="passwordLabel">Create Secure Passkey Phrase</label>
+                <label class="form-label" id="passwordLabel">Create Secure Passkey</label>
                 <div class="password-container">
                     <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
                     <button type="button" class="toggle-visibility-btn" id="togglePassword" title="Toggle Visibility">
@@ -292,7 +292,7 @@
             </div>
 
             <div class="form-group" id="confirmPasswordGroup" style="margin-bottom: 26px;">
-                <label class="form-label">Confirm Secure Passkey Phrase</label>
+                <label class="form-label">Confirm Secure Passkey</label>
                 <div class="password-container">
                     <input class="input-field" type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
                     <button type="button" class="toggle-visibility-btn" id="toggleConfirmPassword" title="Toggle Visibility">
@@ -301,11 +301,11 @@
                 </div>
             </div>
 
-            <button class="submit-btn" type="submit" id="submitActionBtn">Provision Node</button>
+            <button class="submit-btn" type="submit" id="submitActionBtn">Provision</button>
         </form>
 
         <div class="auth-footer" id="formFooterState">
-            Already a registered operator? <a class="auth-link" onclick="toggleFormMode('login')">Login Node</a>
+            Already a registered user? <a class="auth-link" onclick="toggleFormMode('login')">Login</a>
         </div>
     </div>
 
@@ -366,18 +366,18 @@
                 confirmPasswordGroup.style.display = "none";
                 document.getElementById("username").removeAttribute("required");
                 document.getElementById("confirmPassword").removeAttribute("required");
-                passwordLabel.innerText = "Secure Passkey Phrase";
-                submitBtn.innerText = "Initialize Session";
-                footerState.innerHTML = `New operator node? <a class="auth-link" onclick="toggleFormMode('register')">Create New Account</a>`;
+                passwordLabel.innerText = "Secure Passkey Access";
+                submitBtn.innerText = "Login access";
+                footerState.innerHTML = `New Users to Zytherion AI? <a class="auth-link" onclick="toggleFormMode('register')">Create New Account</a>`;
             } else {
                 subtitle.innerText = "Create New Account";
                 usernameGroup.style.display = "block";
                 confirmPasswordGroup.style.display = "block";
                 document.getElementById("username").setAttribute("required", "true");
                 document.getElementById("confirmPassword").setAttribute("required", "true");
-                passwordLabel.innerText = "Create Secure Passkey Phrase";
-                submitBtn.innerText = "Provision Node";
-                footerState.innerHTML = `Already a registered operator? <a class="auth-link" onclick="toggleFormMode('login')">Login Node</a>`;
+                passwordLabel.innerText = "Create Secure Passkey";
+                submitBtn.innerText = "Provision";
+                footerState.innerHTML = `Already a registered user? <a class="auth-link" onclick="toggleFormMode('login')">Login</a>`;
             }
         }
 
