@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zytherion AI — Login</title>
+    <title>Zytherion AI — Authentication</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -247,7 +247,7 @@
 <body>
 
     <div class="top-bar">
-        <button class="ui-btn" id="themeToggleBtn">🌓 Toggle Theme</button>
+        <button class="ui-btn" id="themeToggleBtn">🌓 Theme</button>
     </div>
 
     <div class="auth-card">
@@ -286,7 +286,7 @@
     </div>
 
     <script>
-        // Core Visual State Management (Theme Sync Engine)
+        // Core Visual State Management
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         const savedTheme = localStorage.getItem("theme") || "dark";
         document.documentElement.setAttribute("data-theme", savedTheme);
@@ -298,7 +298,7 @@
             localStorage.setItem("theme", newTheme);
         });
 
-        // Interactive Passkey Visibility Field Router
+        // Passkey Visibility Toggle
         const passwordInput = document.getElementById("password");
         const togglePasswordBtn = document.getElementById("togglePassword");
         const eyeIcon = document.getElementById("eyeIcon");
@@ -324,11 +324,9 @@
             
             errorBox.style.display = "none";
 
-            // Corrected Endpoint Routing Path System targeting the base deployment
-            // Target the explicit API sub-route node
-const AUTH_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:3000/login"
-    : "https://aegisai-backend-ifvc.onrender.com/api/login"; // <--- Updated path
+            // Standard relative routing parameters used to handle server variations cleanly
+            const AUTH_URL = "/login"; 
+
             try {
                 const response = await fetch(AUTH_URL, {
                     method: "POST",
@@ -338,7 +336,7 @@ const AUTH_URL = window.location.hostname === "localhost" || window.location.hos
 
                 const contentType = response.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("Server communication mismatch. Re-verifying operational root parameters.");
+                    throw new Error("Server communication mismatch. Re-verifying registration resource variables.");
                 }
 
                 const data = await response.json();

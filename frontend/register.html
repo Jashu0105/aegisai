@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zytherion AI — Registration</title>
+    <title>Zytherion AI — Authentication</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -238,12 +238,6 @@
             color: #f87171;
         }
 
-        .msg-alert.success {
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            color: #34d399;
-        }
-
         @keyframes cardFadeIn {
             from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
@@ -253,7 +247,7 @@
 <body>
 
     <div class="top-bar">
-        <button class="ui-btn" id="themeToggleBtn">🌓 Toggle Theme</button>
+        <button class="ui-btn" id="themeToggleBtn">🌓 Theme</button>
     </div>
 
     <div class="auth-card">
@@ -261,43 +255,38 @@
             <img class="brand-logo" src="logo.svg" alt="Zytherion Logo">
             <div class="brand-title">
                 Zytherion <span><em>AI</em></span>
-                <div class="brand-subtitle">Register new administrator node</div>
+                <div class="brand-subtitle">Access core operations mainframe</div>
             </div>
         </div>
 
-        <div class="msg-alert" id="statusBox"></div>
+        <div class="msg-alert error" id="errorBox"></div>
 
-        <form id="registerForm" onsubmit="executeRegistration(event)">
-            <div class="form-group">
-                <label class="form-label">Operator Handle Name</label>
-                <input class="input-field" type="text" id="username" placeholder="Operator Name" required autocomplete="name">
-            </div>
-
+        <form id="loginForm" onsubmit="executeAuthentication(event)">
             <div class="form-group">
                 <label class="form-label">Email Matrix String</label>
-                <input class="input-field" type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
+                <input class="input-field" type="email" id="email" placeholder="name@domain.com" required autocomplete="username">
             </div>
             
             <div class="form-group" style="margin-bottom: 28px;">
-                <label class="form-label">Create Secure Passkey Phrase</label>
+                <label class="form-label">Secure Passkey Phrase</label>
                 <div class="password-container">
-                    <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="new-password">
+                    <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
                     <button type="button" class="toggle-visibility-btn" id="togglePassword" title="Toggle Visibility">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
                 </div>
             </div>
 
-            <button class="submit-btn" type="submit">Provision Node</button>
+            <button class="submit-btn" type="submit">Initialize Session</button>
         </form>
 
         <div class="auth-footer">
-            Already a registered operator? <a class="auth-link" href="login.html">Login Node</a>
+            New operator node? <a class="auth-link" href="register.html">Register Terminal</a>
         </div>
     </div>
 
     <script>
-        // Theme Engine Synchronizer
+        // Core Visual State Management
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         const savedTheme = localStorage.getItem("theme") || "dark";
         document.documentElement.setAttribute("data-theme", savedTheme);
@@ -309,14 +298,14 @@
             localStorage.setItem("theme", newTheme);
         });
 
-        // Passkey Character Field Toggle Controller
+        // Passkey Visibility Toggle
         const passwordInput = document.getElementById("password");
         const togglePasswordBtn = document.getElementById("togglePassword");
         const eyeIcon = document.getElementById("eyeIcon");
 
         togglePasswordBtn.addEventListener("click", () => {
-            const isHidden = passwordInput.getAttribute("type") === "password";
-            if (isHidden) {
+            const isCurrentlyHidden = passwordInput.getAttribute("type") === "password";
+            if (isCurrentlyHidden) {
                 passwordInput.setAttribute("type", "text");
                 eyeIcon.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/>`;
             } else {
@@ -325,28 +314,24 @@
             }
         });
 
-        // Registration API Client Network Dispatcher Targeting base endpoint route strings
-        async function executeRegistration(event) {
+        // Authentication Controller Pipeline
+        async function executeAuthentication(event) {
             event.preventDefault();
             
-            const username = document.getElementById("username").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
-            const statusBox = document.getElementById("statusBox");
+            const errorBox = document.getElementById("errorBox");
             
-            statusBox.className = "msg-alert";
-            statusBox.style.display = "none";
+            errorBox.style.display = "none";
 
-            // Target the explicit API sub-route node
-const REGISTER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? "http://localhost:3000/register"
-    : "https://aegisai-backend-ifvc.onrender.com/api/register"; // <--- Updated path
+            // Standard relative routing parameters used to handle server variations cleanly
+            const AUTH_URL = "/login"; 
 
             try {
-                const response = await fetch(REGISTER_URL, {
+                const response = await fetch(AUTH_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ username, email, password })
+                    body: JSON.stringify({ email, password })
                 });
 
                 const contentType = response.headers.get("content-type");
@@ -357,21 +342,16 @@ const REGISTER_URL = window.location.hostname === "localhost" || window.location
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(data.message || "Registration sequence failed.");
+                    throw new Error(data.message || "Access denied. Invalid signature sequence.");
                 }
 
-                statusBox.innerText = "Operator node configured successfully. Redirecting...";
-                statusBox.classList.add("success");
-                statusBox.style.display = "block";
-
-                setTimeout(() => {
-                    window.location.href = "login.html";
-                }, 2000);
+                localStorage.setItem("token", data.token);
+                window.location.href = "index.html";
 
             } catch (error) {
-                statusBox.innerText = error.message;
-                statusBox.classList.add("error");
-                statusBox.style.display = "block";
+                errorBox.innerText = error.message;
+                errorBox.style.display = "block";
+                console.error("Auth Exception Layer Error:", error);
             }
         }
     </script>
