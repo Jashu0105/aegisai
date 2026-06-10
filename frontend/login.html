@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zytherion AI — Gateway Mainframe</title>
+    <title>Zytherion AI</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -50,6 +50,7 @@
             position: relative;
         }
 
+        /* Fixed Top Bar Layout Grid Alignment */
         .top-bar {
             position: absolute;
             top: 0;
@@ -60,6 +61,7 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
+            gap: 12px;
         }
 
         .ui-btn {
@@ -73,13 +75,16 @@
             font-weight: 500;
             display: flex;
             align-items: center;
+            gap: 8px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            text-decoration: none;
         }
 
         .ui-btn:hover {
             border-color: var(--accent);
             box-shadow: 0 0 12px var(--accent-glow);
+            color: var(--text-main);
         }
 
         .auth-card {
@@ -93,7 +98,7 @@
             border-radius: 20px;
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
             animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-            margin-top: 40px;
+            margin-top: 60px;
             margin-bottom: 40px;
         }
 
@@ -258,6 +263,10 @@
 <body>
 
     <div class="top-bar">
+        <a href="mailto:zytherionai@gmail.com?subject=Platform%20Feedback%20-%20Authentication%20Gateway" class="ui-btn" title="Submit Platform Feedback">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <span>Feedback</span>
+        </a>
         <button class="ui-btn" id="themeToggleBtn">🌓 Theme</button>
     </div>
 
@@ -301,7 +310,7 @@
                 </div>
             </div>
 
-            <button class="submit-btn" type="submit" id="submitActionBtn">Provision</button>
+            <button class="submit-btn" type="submit" id="submitActionBtn">Register</button>
         </form>
 
         <div class="auth-footer" id="formFooterState">
@@ -343,7 +352,6 @@
         setupPasswordToggle("password", "togglePassword", "eyeIcon");
         setupPasswordToggle("confirmPassword", "toggleConfirmPassword", "confirmEyeIcon");
 
-        // UI View State Switch Toggle Engine (Presented as Registration / Create New Account First)
         let currentMode = "register";
 
         function toggleFormMode(targetMode) {
@@ -381,10 +389,8 @@
             }
         }
 
-        // Initialize Default View State Configuration Requirements
         toggleFormMode("register");
 
-        // Process Submission Form Logic Operations
         async function handleFormSubmission(event) {
             event.preventDefault();
             
@@ -395,15 +401,12 @@
             statusBox.className = "msg-alert";
             statusBox.style.display = "none";
 
-            // Base Server Cluster Mapping Structure Target Parameters
-            // Hardcoded production endpoint ensuring direct communication with Render
-const BASE_SERVER_URL = "https://aegisai-backend-ifvc.onrender.com";
+            const BASE_SERVER_URL = "https://aegisai-backend-ifvc.onrender.com";
 
             if (currentMode === "register") {
                 const username = document.getElementById("username").value.trim();
                 const confirmPassword = document.getElementById("confirmPassword").value;
 
-                // 1. Password Matching Field Logic Verification
                 if (password !== confirmPassword) {
                     statusBox.innerText = "Validation Failed: Passkey entries mismatch. Both passphrases must be identical.";
                     statusBox.classList.add("error");
@@ -411,7 +414,6 @@ const BASE_SERVER_URL = "https://aegisai-backend-ifvc.onrender.com";
                     return;
                 }
 
-                // 2. Strict Complex Security Policy Policy Rules Validation
                 const minLength = password.length >= 8;
                 const hasUppercase = /[A-Z]/.test(password);
                 const hasLowercase = /[a-z]/.test(password);
@@ -425,7 +427,6 @@ const BASE_SERVER_URL = "https://aegisai-backend-ifvc.onrender.com";
                     return;
                 }
 
-                // Dispatch New Account Data to verified endpoint location
                 try {
                     const response = await fetch(`${BASE_SERVER_URL}/api/auth/register`, {
                         method: "POST",
@@ -449,7 +450,6 @@ const BASE_SERVER_URL = "https://aegisai-backend-ifvc.onrender.com";
                 }
 
             } else {
-                // Execute Secure Login Pipeline
                 try {
                     const response = await fetch(`${BASE_SERVER_URL}/api/auth/login`, {
                         method: "POST",

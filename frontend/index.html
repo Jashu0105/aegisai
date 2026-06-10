@@ -150,6 +150,7 @@
 
         .controls-group {
             display: flex;
+            align-items: center;
             gap: 12px;
         }
 
@@ -164,12 +165,14 @@
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            text-decoration: none;
         }
 
         .ui-btn:hover {
             border-color: var(--accent);
             box-shadow: 0 0 12px var(--accent-glow);
+            color: var(--text-main);
         }
 
         /* Chat Streams Container */
@@ -301,15 +304,19 @@
 </head>
 <body>
 
-    <div class="sidebar">
+  <div class="sidebar">
         <div class="sidebar-header">Local Workspaces</div>
-        <div class="local-history-container" id="localHistory">
-            </div>
+        
+        <button class="ui-btn" id="newChatBtn" style="justify-content: center; margin-bottom: 16px; font-weight: 600; border-color: var(--accent);">
+            + New Chat
+        </button>
+
+        <div class="local-history-container" id="localHistory"></div>
         <button class="ui-btn" id="clearLogsBtn" style="margin-top: auto; justify-content: center; font-size: 12px;">
             Clear Local Logs
         </button>
     </div>
-
+    
     <div class="main-workspace">
         <div class="top-bar">
             <div class="brand-title">
@@ -317,13 +324,16 @@
                 <span>Zytherion <em>AI</em></span>
             </div>
             <div class="controls-group">
+                <a href="mailto:zytherionai@gmail.com?subject=Platform%20Feedback%20-%20Active%20Console" class="ui-btn" title="Submit Platform Feedback">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Feedback</span>
+                </a>
                 <button class="ui-btn" id="themeToggleBtn">🌓 Theme</button>
                 <button class="ui-btn" id="logoutBtn" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.15);">Logout</button>
             </div>
         </div>
 
-        <div class="chat-viewports" id="chat-container">
-            </div>
+        <div class="chat-viewports" id="chat-container"></div>
 
         <div class="input-dock">
             <div class="input-wrapper">
@@ -336,7 +346,7 @@
                     <a href="mailto:zytherionai@gmail.com" class="support-icon-link" title="Email Support">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                     </a>
-                    <a href="https://www.instagram.com/zyntherionai" target="_blank" rel="noopener noreferrer" class="support-icon-link" title="Instagram Support">
+                    <a href="https://www.instagram.com/zytherionai" target="_blank" rel="noopener noreferrer" class="support-icon-link" title="Instagram Support">
                         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
                     </a>
                 </div>
