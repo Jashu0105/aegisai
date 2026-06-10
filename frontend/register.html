@@ -377,12 +377,10 @@
                 statusBox.style.display = "block";
                 return;
             }
-
             // Production Absolute URL Mapping Strategy targeting Render API directly
-            const REGISTER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-                ? "http://localhost:3000/register"
-                : "https://aegisai-backend-ifvc.onrender.com/register"; 
-
+const REGISTER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "http://localhost:3000/register"
+    : "https://aegisai-backend-ifvc.onrender.com/"; // <--- Point this to the root as well
             try {
                 const response = await fetch(REGISTER_URL, {
                     method: "POST",

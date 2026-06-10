@@ -326,12 +326,11 @@
 
             // STRATEGY: Switch the commented blocks below depending on your backend configuration definitions.
             
-            // CONFIGURATION VARIANT A: Standard API route endpoint
-            const AUTH_URL = "https://aegisai-backend-ifvc.onrender.com/api/login";
+           // CONFIGURATION VARIANT A: Standard API route endpoint (Commented out)
+// const AUTH_URL = "https://aegisai-backend-ifvc.onrender.com/api/login";
 
-            // CONFIGURATION VARIANT B: Root fallback path endpoint (Uncomment below if Variant A gives a 404)
-            // const AUTH_URL = "https://aegisai-backend-ifvc.onrender.com/";
-
+// CONFIGURATION VARIANT B: Root fallback path endpoint (UNCOMMENTED & ACTIVE)
+const AUTH_URL = "https://aegisai-backend-ifvc.onrender.com/";
             try {
                 const response = await fetch(AUTH_URL, {
                     method: "POST",
