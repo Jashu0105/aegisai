@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zytherion AI — Authentication</title>
+    <title>Zytherion AI — Terminal Registration</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -40,12 +40,13 @@
             background: var(--bg-gradient);
             background-attachment: fixed;
             color: var(--text-main);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
+            padding: 20px;
+            overflow-y: auto;
             position: relative;
         }
 
@@ -87,11 +88,12 @@
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             width: 100%;
-            max-width: 420px;
+            max-width: 440px;
             padding: 40px;
             border-radius: 20px;
             box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
             animation: cardFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+            margin-top: 60px;
         }
 
         .brand-header {
@@ -99,7 +101,7 @@
             flex-direction: column;
             align-items: center;
             gap: 16px;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
             text-align: center;
         }
 
@@ -127,7 +129,7 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .form-label {
@@ -145,7 +147,7 @@
             border: 1px solid var(--glass-border);
             outline: none;
             color: var(--text-main);
-            padding: 14px 16px;
+            padding: 12px 16px;
             font-size: 15px;
             border-radius: 10px;
             transition: border-color 0.2s, box-shadow 0.2s;
@@ -230,12 +232,19 @@
             display: none;
             text-align: center;
             word-break: break-word;
+            line-height: 1.5;
         }
 
         .msg-alert.error {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.2);
             color: #f87171;
+        }
+
+        .msg-alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            color: #34d399;
         }
 
         @keyframes cardFadeIn {
@@ -255,38 +264,53 @@
             <img class="brand-logo" src="logo.svg" alt="Zytherion Logo">
             <div class="brand-title">
                 Zytherion <span><em>AI</em></span>
-                <div class="brand-subtitle">Access core operations mainframe</div>
+                <div class="brand-subtitle">Provision New Operator Terminal Node</div>
             </div>
         </div>
 
-        <div class="msg-alert error" id="errorBox"></div>
+        <div class="msg-alert" id="statusBox"></div>
 
-        <form id="loginForm" onsubmit="executeAuthentication(event)">
+        <form id="registerForm" onsubmit="executeRegistration(event)">
+            <div class="form-group">
+                <label class="form-label">Operator Handle Name</label>
+                <input class="input-field" type="text" id="username" placeholder="Operator Name" required autocomplete="name">
+            </div>
+
             <div class="form-group">
                 <label class="form-label">Email Matrix String</label>
-                <input class="input-field" type="email" id="email" placeholder="name@domain.com" required autocomplete="username">
+                <input class="input-field" type="email" id="email" placeholder="name@domain.com" required autocomplete="email">
             </div>
             
-            <div class="form-group" style="margin-bottom: 28px;">
-                <label class="form-label">Secure Passkey Phrase</label>
+            <div class="form-group">
+                <label class="form-label">Create Secure Passkey Phrase</label>
                 <div class="password-container">
-                    <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                    <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="new-password">
                     <button type="button" class="toggle-visibility-btn" id="togglePassword" title="Toggle Visibility">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
                 </div>
             </div>
 
-            <button class="submit-btn" type="submit">Initialize Session</button>
+            <div class="form-group" style="margin-bottom: 26px;">
+                <label class="form-label">Confirm Secure Passkey Phrase</label>
+                <div class="password-container">
+                    <input class="input-field" type="password" id="confirmPassword" placeholder="••••••••" required autocomplete="new-password">
+                    <button type="button" class="toggle-visibility-btn" id="toggleConfirmPassword" title="Toggle Visibility">
+                        <svg id="confirmEyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <button class="submit-btn" type="submit">Provision Node</button>
         </form>
 
         <div class="auth-footer">
-            New operator node? <a class="auth-link" href="register.html">Register Terminal</a>
+            Already a registered operator? <a class="auth-link" href="login.html">Login Node</a>
         </div>
     </div>
 
     <script>
-        // Core Visual State Management
+        // Theme Engine Synchronizer
         const themeToggleBtn = document.getElementById("themeToggleBtn");
         const savedTheme = localStorage.getItem("theme") || "dark";
         document.documentElement.setAttribute("data-theme", savedTheme);
@@ -298,60 +322,92 @@
             localStorage.setItem("theme", newTheme);
         });
 
-        // Passkey Visibility Toggle
-        const passwordInput = document.getElementById("password");
-        const togglePasswordBtn = document.getElementById("togglePassword");
-        const eyeIcon = document.getElementById("eyeIcon");
+        // Passkey Character Field Toggle Controller
+        function setupPasswordToggle(inputElementId, buttonElementId, iconElementId) {
+            const input = document.getElementById(inputElementId);
+            const btn = document.getElementById(buttonElementId);
+            const icon = document.getElementById(iconElementId);
 
-        togglePasswordBtn.addEventListener("click", () => {
-            const isCurrentlyHidden = passwordInput.getAttribute("type") === "password";
-            if (isCurrentlyHidden) {
-                passwordInput.setAttribute("type", "text");
-                eyeIcon.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/>`;
-            } else {
-                passwordInput.setAttribute("type", "password");
-                eyeIcon.innerHTML = `<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/>`;
-            }
-        });
+            btn.addEventListener("click", () => {
+                const isHidden = input.getAttribute("type") === "password";
+                if (isHidden) {
+                    input.setAttribute("type", "text");
+                    icon.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+                } else {
+                    input.setAttribute("type", "password");
+                    icon.innerHTML = `<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/>`;
+                }
+            });
+        }
 
-        // Authentication Controller Pipeline
-        async function executeAuthentication(event) {
+        setupPasswordToggle("password", "togglePassword", "eyeIcon");
+        setupPasswordToggle("confirmPassword", "toggleConfirmPassword", "confirmEyeIcon");
+
+        // Advanced Validation & Registration Handler
+        async function executeRegistration(event) {
             event.preventDefault();
             
+            const username = document.getElementById("username").value.trim();
             const email = document.getElementById("email").value.trim();
             const password = document.getElementById("password").value;
-            const errorBox = document.getElementById("errorBox");
+            const confirmPassword = document.getElementById("confirmPassword").value;
+            const statusBox = document.getElementById("statusBox");
             
-            errorBox.style.display = "none";
+            statusBox.className = "msg-alert";
+            statusBox.style.display = "none";
 
-            // Standard relative routing parameters used to handle server variations cleanly
-            const AUTH_URL = "/login"; 
+            // 1. Check Passwords Matching Security Policy
+            if (password !== confirmPassword) {
+                statusBox.innerText = "Security Validation Failed: Passkey mismatch. Both passphrase entries must be identical.";
+                statusBox.classList.add("error");
+                statusBox.style.display = "block";
+                return;
+            }
+
+            // 2. Enforce Complex Password Policy Requirements
+            const minLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasDigit = /[0-9]/.test(password);
+            const hasSpecial = /[^A-Za-z0-9]/.test(password);
+
+            if (!minLength || !hasUppercase || !hasLowercase || !hasDigit || !hasSpecial) {
+                statusBox.innerText = "Security Weakness: Your passkey must be at least 8 characters long and include an uppercase letter, a lowercase letter, a numeric digit, and at least one special character.";
+                statusBox.classList.add("error");
+                statusBox.style.display = "block";
+                return;
+            }
+
+            // Production Absolute URL Mapping Strategy targeting Render API directly
+            const REGISTER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+                ? "http://localhost:3000/register"
+                : "https://aegisai-backend-ifvc.onrender.com/register"; 
 
             try {
-                const response = await fetch(AUTH_URL, {
+                const response = await fetch(REGISTER_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email, password })
+                    body: JSON.stringify({ username, email, password })
                 });
-
-                const contentType = response.headers.get("content-type");
-                if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("Server communication mismatch. Re-verifying registration resource variables.");
-                }
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(data.message || "Access denied. Invalid signature sequence.");
+                    throw new Error(data.message || "Registration deployment failed at backend node.");
                 }
 
-                localStorage.setItem("token", data.token);
-                window.location.href = "index.html";
+                statusBox.innerText = "Success: Operational access granted. Directing node to authentication mainframe...";
+                statusBox.classList.add("success");
+                statusBox.style.display = "block";
+
+                setTimeout(() => {
+                    window.location.href = "login.html";
+                }, 2000);
 
             } catch (error) {
-                errorBox.innerText = error.message;
-                errorBox.style.display = "block";
-                console.error("Auth Exception Layer Error:", error);
+                statusBox.innerText = "System Interface Error: " + error.message;
+                statusBox.classList.add("error");
+                statusBox.style.display = "block";
             }
         }
     </script>
