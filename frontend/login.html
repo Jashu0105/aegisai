@@ -49,7 +49,6 @@
             position: relative;
         }
 
-        /* Top Bar Utilities Frame */
         .top-bar {
             position: absolute;
             top: 0;
@@ -82,7 +81,6 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
-        /* Glassmorphic Auth Card Frame */
         .auth-card {
             background: var(--glass-bg);
             border: 1px solid var(--glass-border);
@@ -128,7 +126,6 @@
             margin-top: 4px;
         }
 
-        /* Form Controls and Input Fields Layout */
         .form-group {
             margin-bottom: 20px;
         }
@@ -159,6 +156,34 @@
             box-shadow: 0 0 14px var(--accent-glow);
         }
 
+        /* Responsive Password Wrapper Input Group */
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-container .input-field {
+            padding-right: 46px;
+        }
+
+        .toggle-visibility-btn {
+            position: absolute;
+            right: 14px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+        }
+
+        .toggle-visibility-btn:hover {
+            color: var(--text-main);
+        }
+
         .submit-btn {
             width: 100%;
             background: var(--accent);
@@ -181,7 +206,6 @@
             transform: scale(0.98);
         }
 
-        /* Bottom Alternate Links Option */
         .auth-footer {
             text-align: center;
             margin-top: 24px;
@@ -199,7 +223,6 @@
             text-decoration: underline;
         }
 
-        /* Error/Status Box Alerts */
         .msg-alert {
             padding: 12px;
             border-radius: 8px;
@@ -207,6 +230,7 @@
             margin-bottom: 20px;
             display: none;
             text-align: center;
+            word-break: break-word;
         }
 
         .msg-alert.error {
@@ -246,7 +270,12 @@
             
             <div class="form-group" style="margin-bottom: 28px;">
                 <label class="form-label">Secure Passkey Phrase</label>
-                <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                <div class="password-container">
+                    <input class="input-field" type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                    <button type="button" class="toggle-visibility-btn" id="togglePassword" title="Toggle Visibility">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/></svg>
+                    </button>
+                </div>
             </div>
 
             <button class="submit-btn" type="submit">Initialize Session</button>
@@ -270,6 +299,24 @@
             localStorage.setItem("theme", newTheme);
         });
 
+        // Interactive Passkey Visibility Field Router
+        const passwordInput = document.getElementById("password");
+        const togglePasswordBtn = document.getElementById("togglePassword");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        togglePasswordBtn.addEventListener("click", () => {
+            const isCurrentlyHidden = passwordInput.getAttribute("type") === "password";
+            if (isCurrentlyHidden) {
+                passwordInput.setAttribute("type", "text");
+                // Update SVG geometry path to Slash Eye (Visible State)
+                eyeIcon.innerHTML = `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/><line x1="1" y1="1" x2="23" y2="23"/>`;
+            } else {
+                passwordInput.setAttribute("type", "password");
+                // Restore standard view path geometry
+                eyeIcon.innerHTML = `<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0z"/><circle cx="12" cy="12" r="3"/>`;
+            }
+        });
+
         // Authentication Controller Pipeline
         async function executeAuthentication(event) {
             event.preventDefault();
@@ -280,7 +327,7 @@
             
             errorBox.style.display = "none";
 
-            // Endpoint Router Architecture matching project clusters
+            // If routing paths have been migrated to /login, make sure server cluster maps this resource node
             const AUTH_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
                 ? "http://localhost:3000/login"
                 : "https://aegisai-backend-ifvc.onrender.com/login";
@@ -292,20 +339,25 @@
                     body: JSON.stringify({ email, password })
                 });
 
+                // Intercept HTML fallback routes explicitly to provide clean debug error messages
+                const contentType = response.headers.get("content-type");
+                if (!contentType || !contentType.includes("application/json")) {
+                    throw new Error("Server returned an invalid route response. Check backend API mapping or routing setup.");
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
                     throw new Error(data.message || "Access denied. Invalid signature sequence.");
                 }
 
-                // Inject token configuration parameters into browser safe-stacks
                 localStorage.setItem("token", data.token);
                 window.location.href = "index.html";
 
             } catch (error) {
                 errorBox.innerText = error.message;
                 errorBox.style.display = "block";
-                console.error("Auth Exception Link Layer Error:", error);
+                console.error("Auth Exception Layer Error:", error);
             }
         }
     </script>
