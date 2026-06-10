@@ -325,7 +325,7 @@
             }
         });
 
-        // Registration API Client Network Dispatcher
+        // Registration API Client Network Dispatcher Targeting base endpoint route strings
         async function executeRegistration(event) {
             event.preventDefault();
             
@@ -339,7 +339,7 @@
 
             const REGISTER_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
                 ? "http://localhost:3000/register"
-                : "https://aegisai-backend-ifvc.onrender.com/register";
+                : "https://aegisai-backend-ifvc.onrender.com/"; 
 
             try {
                 const response = await fetch(REGISTER_URL, {
@@ -350,7 +350,7 @@
 
                 const contentType = response.headers.get("content-type");
                 if (!contentType || !contentType.includes("application/json")) {
-                    throw new Error("Server communication mismatch. Check your backend routing endpoint configuration parameters.");
+                    throw new Error("Server communication mismatch. Re-verifying registration resource variables.");
                 }
 
                 const data = await response.json();
